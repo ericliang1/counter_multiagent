@@ -33,13 +33,3 @@ The **ZoneCenter** agent looks at that frame and translates the vague zone phras
 The **LineDrawer** tracks objects of the target class for about ten seconds, estimates their average direction of motion, and draws a "gate" line through the anchor point oriented perpendicular to that motion — so objects travelling through the zone cross it head-on. This is the step that makes the system angle-agnostic: the line follows the scene's own flow rather than a fixed orientation.
 
 The **Evaluator** then tracks objects across the full video and counts each unique track exactly once as its center crosses the gate, using a counterclockwise segment-intersection test. It writes an annotated video with the gate, track IDs, and a running count.
-
-## Why split it into agents
-
-Each stage solves one problem with the tool best suited to it — language understanding (LLM), spatial grounding (vision-language model), and detection plus geometry (YOLO) — and hands a clean artifact to the next. That separation is what gives the system its flexibility:
-
-- **Generality over angle and scene.** Because *where* to count comes from a VLM and *how* the line is oriented comes from observed motion, no stage hard-codes a camera position. New angles need no new code or manual lines.
-- **Language as the only input.** Swapping what you count, or where, is a sentence change — not a re-configuration.
-- **Independently improvable.** Any single stage (a better detector, a stronger grounding model) can be replaced without touching the others.
-
-The core idea: language supplies the *what* and a rough *where*, while motion and detection supply the line geometry and the counting. Conceptually it's a virtual tripwire that draws and aligns itself — no manual class picking or line drawing required.
